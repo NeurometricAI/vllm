@@ -410,6 +410,12 @@ _MULTIMODAL_MODELS = {
         "granite_speech",
         "GraniteSpeechForConditionalGeneration",
     ),
+    # GraniteSpeechPlus differs from GraniteSpeech only in an optional
+    # encoder.cat_hidden_layers concat handled by the same module class.
+    "GraniteSpeechPlusForConditionalGeneration": (
+        "granite_speech",
+        "GraniteSpeechForConditionalGeneration",
+    ),
     "Granite4VisionForConditionalGeneration": (
         "granite4_vision",
         "Granite4VisionForConditionalGeneration",

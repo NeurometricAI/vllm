@@ -546,15 +546,33 @@ class GraniteSpeechCTCEncoder(nn.Module):
 
     def forward(self, hidden_states: torch.Tensor):
         hidden_states = self.input_linear(hidden_states)
+        # GraniteSpeechPlus: capture configured intermediate layer outputs
+        # for concatenation with the final encoder output before the
+        # projector. Empty/missing on base GraniteSpeech → no-op.
+        cat_layers = set(getattr(self.config, "cat_hidden_layers", None) or [])
+        exported_hidden_states: list[torch.Tensor] = []
+
+        if 0 in cat_layers:
+            exported_hidden_states.append(hidden_states)
+
         for idx, layer in enumerate(self.layers, start=1):
             hidden_states = layer(hidden_states, attention_dists=self.attention_dists)
+
+            if idx in cat_layers:
+                exported_hidden_states.append(hidden_states)
 
             if idx == self.num_layers // 2:
                 hidden_states_mid = hidden_states.clone()
                 hidden_states_mid, _ = self.out(hidden_states_mid)
                 hidden_states_mid = self.softmax(hidden_states_mid)
                 hidden_states_mid, _ = self.out_mid(hidden_states_mid)
-                hidden_states += hidden_states_mid
+                # Non-in-place: an exported tensor may alias `hidden_states`.
+                hidden_states = hidden_states + hidden_states_mid
+
+        if exported_hidden_states:
+            hidden_states = torch.cat(
+                [*exported_hidden_states, hidden_states], dim=-1
+            )
         return hidden_states
 
 
