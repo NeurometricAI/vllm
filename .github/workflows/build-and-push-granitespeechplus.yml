@@ -45,5 +45,9 @@ jobs:
           tags: |
             ghcr.io/neurometricai/vllm-openai:v0.20.2-granitespeechplus
             ghcr.io/neurometricai/vllm-openai:sha-${{ github.sha }}
+          build-args: |
+            torch_cuda_arch_list=8.9
+            max_jobs=2
+            nvcc_threads=2
           cache-from: type=gha
           cache-to: type=gha,mode=max
