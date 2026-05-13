@@ -1,5 +1,10 @@
 FROM vllm/vllm-openai:v0.20.2
 
+# vLLM's `audio` extras: PyAV demuxer, scipy/soundfile decoders, mistral_common
+# resampling. The stock vllm-openai:v0.20.2 image omits these, so the
+# /v1/audio/transcriptions endpoint 400s with "Invalid or unsupported audio file."
+RUN pip install --no-cache-dir av scipy soundfile 'mistral_common[audio]'
+
 COPY vllm/model_executor/models/granite_speech.py \
      /usr/local/lib/python3.12/site-packages/vllm/model_executor/models/granite_speech.py
 COPY vllm/model_executor/models/registry.py \
