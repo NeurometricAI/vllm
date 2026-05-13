@@ -1,0 +1,6 @@
+FROM vllm/vllm-openai:v0.20.2
+
+COPY vllm/model_executor/models/granite_speech.py \
+     /usr/local/lib/python3.12/site-packages/vllm/model_executor/models/granite_speech.py
+COPY vllm/model_executor/models/registry.py \
+     /usr/local/lib/python3.12/site-packages/vllm/model_executor/models/registry.py
